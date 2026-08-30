@@ -38,8 +38,8 @@ GMAIL_USER = os.environ["GMAIL_USER"]
 GMAIL_APP_PASSWORD = os.environ["GMAIL_APP_PASSWORD"]
 ALERT_EMAIL_TO = os.environ["ALERT_EMAIL_TO"]
 
-POLL_INTERVAL_SECONDS = int(os.environ.get("POLL_INTERVAL_SECONDS", "60"))
-MAX_RUNTIME_MINUTES = int(os.environ.get("MAX_RUNTIME_MINUTES", "230"))  # ~3h50m
+POLL_INTERVAL_SECONDS = int(os.environ.get("POLL_INTERVAL_SECONDS") or "60")
+MAX_RUNTIME_MINUTES = int(os.environ.get("MAX_RUNTIME_MINUTES") or "230")  # ~3h50m
 COMMIT_EVERY_MINUTES = 15  # how often to push state.json just for freshness
 
 STATE_FILE = Path(__file__).parent / "state.json"
