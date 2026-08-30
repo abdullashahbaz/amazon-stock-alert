@@ -1,0 +1,48 @@
+name: Check Amazon Stock
+
+on:
+  schedule:
+    # Fires every 3 hours (8x/day). Each run loops for ~3h50m — LONGER than
+    # the 3-hour gap between triggers, so the next run starts *before* the
+    # previous one finishes. That overlap is intentional: it's what closes
+    # the gap down to effectively nothing, at the cost of running two
+    # checks in parallel for ~50 minutes out of every 3 hours.
+    - cron: "0 */3 * * *"
+  workflow_dispatch: {} # lets you trigger a run manually from the Actions tab
+
+permissions:
+  contents: write # needed so the workflow can commit the updated state.json
+
+# No concurrency lock here on purpose — overlapping runs are how the gap
+# gets closed. Both runs writing to state.json is handled safely: each
+# commit is best-effort (see commit_state() in check_stock.py), so if two
+# pushes collide, one just quietly skips and the other wins.
+
+jobs:
+  check-stock:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350 # safety net; the script exits itself well before this
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure git identity
+        run: |
+          git config user.name "stock-alert-bot"
+          git config user.email "actions@github.com"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run stock monitor loop
+        env:
+          ASIN: ${{ vars.ASIN }}
+          AMAZON_DOMAIN: ${{ vars.AMAZON_DOMAIN }}
+          POLL_INTERVAL_SECONDS: ${{ vars.POLL_INTERVAL_SECONDS }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          ALERT_EMAIL_TO: ${{ secrets.ALERT_EMAIL_TO }}
+        run: python check_stock.py
