@@ -57,6 +57,7 @@ POLL_INTERVAL_SECONDS = int(_env("POLL_INTERVAL_SECONDS", "60"))
 MAX_RUNTIME_MINUTES = int(_env("MAX_RUNTIME_MINUTES", "230"))  # ~3h50m
 ONLY_AMAZON_SELLER = _env("ONLY_AMAZON_SELLER", "true").lower() in ("1", "true", "yes")
 COMMIT_EVERY_MINUTES = 15  # how often to push state.json just for freshness
+TEST_EMAIL = _env("TEST_EMAIL").lower() in ("1", "true", "yes")  # send one test email, then exit
 
 STATE_FILE = Path(__file__).parent / "state.json"
 
@@ -260,6 +261,17 @@ def check_product(asin, pstate):
 
 
 def main():
+    if TEST_EMAIL:
+        # One-off check that the Gmail credentials work. A failure raises, so the
+        # GitHub run shows red with the SMTP error (e.g. 535 = bad app password).
+        send_email(
+            "Stock alert bot: test email",
+            "If you can read this, the bot can send you alerts.\n\n"
+            f"Watching: {', '.join(ASINS)} on {DOMAIN}",
+        )
+        print(f"Test email sent to {ALERT_EMAIL_TO}.")
+        return
+
     state = load_state()
     start = datetime.now(timezone.utc)
     end = start + timedelta(minutes=MAX_RUNTIME_MINUTES)
