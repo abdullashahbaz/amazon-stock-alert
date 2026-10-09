@@ -8,7 +8,12 @@ on:
     # the gap down to effectively nothing, at the cost of running two
     # checks in parallel for ~50 minutes out of every 3 hours.
     - cron: "0 */3 * * *"
-  workflow_dispatch: {} # lets you trigger a run manually from the Actions tab
+  workflow_dispatch: # lets you trigger a run manually from the Actions tab
+    inputs:
+      test_email:
+        description: "Only send one test email, then stop (checks the Gmail setup)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write # needed so the workflow can commit the updated state.json
@@ -42,6 +47,7 @@ jobs:
           ASINS: ${{ vars.ASINS }}
           ASIN: ${{ vars.ASIN }}
           ONLY_AMAZON_SELLER: ${{ vars.ONLY_AMAZON_SELLER }}
+          TEST_EMAIL: ${{ inputs.test_email }}
           AMAZON_DOMAIN: ${{ vars.AMAZON_DOMAIN }}
           POLL_INTERVAL_SECONDS: ${{ vars.POLL_INTERVAL_SECONDS }}
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
