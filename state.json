@@ -1,5 +1,9 @@
 {
-  "notified": false,
-  "last_status": "unknown",
-  "last_checked": "2026-09-12 18:27:05 UTC"
+  "products": {
+    "B0DHXN44YX": {
+      "notified": false,
+      "last_status": "unknown",
+      "last_checked": "2026-10-09 12:59:01 UTC"
+    }
+  }
 }
