@@ -1,9 +1,9 @@
 {
   "products": {
     "B0DHXN44YX": {
-      "notified": true,
-      "last_status": "in_stock",
-      "last_checked": "2026-11-19 13:00:53 UTC"
+      "notified": false,
+      "last_status": "out_of_stock",
+      "last_checked": "2026-11-19 13:05:58 UTC"
     }
   }
 }
